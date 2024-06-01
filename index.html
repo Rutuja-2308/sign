@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Google OAuth 2.0 Login</title>
+    <style>
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
+        .logo {
+            margin-bottom: 20px;
+        }
+        .buttons-container {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .google-logo {
+            width: 24px;
+            height: 24px;
+            margin-right: 8px;
+            vertical-align: middle;
+        }
+    </style>
+    <script src="https://apis.google.com/js/platform.js" async defer></script>
+    <script>
+        // Function to initialize Google Sign-In
+        function initGoogleSignIn() {
+            gapi.load('auth2', function() {
+                const auth2 = gapi.auth2.init({
+                    client_id: 'YOUR_CLIENT_ID', // Replace with your client ID
+                    cookiepolicy: 'single_host_origin',
+                    ux_mode: 'popup', // Set UX mode to popup for account selection
+                    scope: 'profile email'
+                });
+                attachSignin(document.getElementById('googleSignInBtn'), auth2);
+            });
+        }
+
+        // Function to attach sign-in action to a button
+        function attachSignin(element, auth2) {
+            auth2.attachClickHandler(element, {}, onSuccess, onFailure);
+        }
+
+        // Function to handle successful sign-in
+        function onSuccess(googleUser) {
+            console.log('User signed in.');
+            const profile = googleUser.getBasicProfile();
+            console.log('ID: ' + profile.getId()); // Do not send to your backend! Use an ID token instead.
+            console.log('Name: ' + profile.getName());
+            console.log('Image URL: ' + profile.getImageUrl());
+            console.log('Email: ' + profile.getEmail()); // This is null if the 'email' scope is not present.
+        }
+
+        // Function to handle sign-in failure
+        function onFailure(error) {
+            console.error('Sign-in failed:', error);
+        }
+
+        // Function to handle sign-out
+        function signOut() {
+            const auth2 = gapi.auth2.getAuthInstance();
+            auth2.signOut().then(function() {
+                console.log('User signed out.');
+                // You can perform further actions after sign-out if needed
+            });
+        }
+    </script>
+</head>
+<body>
+    <div class="container">
+        <!-- Google logo -->
+        <div class="logo">
+            <img src="https://www.google.com/images/branding/googlelogo/1x/googlelogo_color_272x92dp.png" alt="Google Logo">
+        </div>
+
+        <!-- Buttons container -->
+        <div class="buttons-container">
+            <!-- Sign in with Google button -->
+            <button id="googleSignInBtn">
+                <img src="https://www.google.com/favicon.ico" alt="Google Logo" class="google-logo">
+                Continue with Google
+            </button>
+
+            <!-- Sign out button -->
+            <button onclick="signOut()">Sign out</button>
+        </div>
+    </div>
+
+    <!-- Load Google API and initialize Sign-In -->
+    <script>
+        initGoogleSignIn();
+    </script>
+</body>
+</html>
